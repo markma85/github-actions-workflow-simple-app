@@ -4,6 +4,8 @@ env:
   AZURE_CONTAINER_REGISTRY_NAME: "acr20241022mark"
   AZURE_CONTAINER_REGISTRY: "acr20241022mark.azurecr.io"
   CONTAINER_NAME: "hello-world"
+  RESOURCE_GROUP: "rg-github-actions-demo1"
+  CLUSTER_NAME: "aks-mark-aue"
   
 on:
   push:
@@ -41,10 +43,63 @@ jobs:
           tags: ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.CONTAINER_NAME }}:${{ github.sha }}
           file: "./Dockerfile"
       
-  # deployToAKS:
-  #   runs-on: ubuntu-latest
+  deployToAKS:
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #     - name: 
-  #       uses: 
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+
+    environment: Production
+
+    needs: [buildContainerImage]
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.1
+
+      - name: Azure Login
+        uses: Azure/login@v2.2.0
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Setup kubelogin
+        uses: Azure/use-kubelogin@v1
+
+      - name: Kubernetes Set Context
+        uses: Azure/k8s-set-context@v3.0
+        with:
+          resource-group: ${{ env.RESOURCE_GROUP }}
+          # Azure connected cluster name
+          cluster-name: ${{ env.CLUSTER_NAME }}
+          admin: false
+
+      - name: envsubst-action
+        uses: danielr1996/envsubst-action@1.1.0
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          AZURE_CONTAINER_REGISTRY: ${{ env.AZURE_CONTAINER_REGISTRY }}
+          CONTAINER_NAME: ${{ env.CONTAINER_NAME }}
+        with:
+          # File to run substitutions on
+          input: kubernetes/hello-world-deployment.yaml
+          # File to write result to
+          output: hello-world-deployment.yaml
+
+      - name: Deploy to Kubernetes cluster
+        uses: Azure/k8s-deploy@v4.9
+        with:
+          action: deploy
+          manifests:
+            hello-world-deployment.yaml
+            kubernetes/hello-world-service.yaml
+          images: ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.CONTAINER_NAME }}:${{ github.sha }}
+            
+        
+
+        
+      
     
