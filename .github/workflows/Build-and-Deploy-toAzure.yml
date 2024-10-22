@@ -77,8 +77,8 @@ jobs:
           resource-group: ${{ env.RESOURCE_GROUP }}
           # Azure connected cluster name
           cluster-name: ${{ env.CLUSTER_NAME }}
-          admin: false
-          use-kubelogin: "true"
+          admin: 'false'
+          use-kubelogin: 'true'
 
       - name: envsubst-action
         uses: danielr1996/envsubst-action@1.1.0
