@@ -69,7 +69,7 @@ jobs:
       - name: Setup kubelogin
         uses: Azure/use-kubelogin@v1
         with:
-          kubelogin-version: 'v1.29.9'
+          kubelogin-version: 'v0.0.25'
         
       - name: Get K8s Context
         uses: Azure/aks-set-context@v3
