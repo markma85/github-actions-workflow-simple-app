@@ -96,9 +96,11 @@ jobs:
           CONTAINER_NAME: ${{ env.CONTAINER_NAME }}
         with:
           # File to run substitutions on
-          input: kubernetes/hello-world-deployment.yaml
+          input:
+            kubernetes/hello-world-deployment.yaml
           # File to write result to
-          output: hello-world-deployment.yaml
+          output:
+            hello-world-deployment.yaml
 
       - name: Deploy to Kubernetes cluster
         uses: Azure/k8s-deploy@v4.9
