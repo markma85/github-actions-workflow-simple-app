@@ -41,7 +41,7 @@ jobs:
         with:
           push: true
           tags: ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.CONTAINER_NAME }}:${{ github.sha }}
-          file: "./Dockerfile"
+          file: ./Dockerfile
       
   deployToAKS:
     runs-on: ubuntu-latest
@@ -106,7 +106,7 @@ jobs:
         uses: Azure/k8s-deploy@v4.9
         with:
           action: deploy
-          manifests:
+          manifests: |
             hello-world-deployment.yaml
             kubernetes/hello-world-service.yaml
           images: ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.CONTAINER_NAME }}:${{ github.sha }}
