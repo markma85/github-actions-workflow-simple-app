@@ -70,15 +70,23 @@ jobs:
         uses: Azure/use-kubelogin@v1
         with:
           kubelogin-version: 'v1.29.9'
-
-      - name: Kubernetes Set Context
-        uses: Azure/k8s-set-context@v3.0
+        
+      - name: Get K8s Context
+        uses: Azure/aks-set-context@v3
         with:
           resource-group: ${{ env.RESOURCE_GROUP }}
-          # Azure connected cluster name
           cluster-name: ${{ env.CLUSTER_NAME }}
           admin: 'false'
           use-kubelogin: 'true'
+
+      # - name: Kubernetes Set Context
+      #   uses: Azure/k8s-set-context@v3.0
+      #   with:
+      #     resource-group: ${{ env.RESOURCE_GROUP }}
+      #     # Azure connected cluster name
+      #     cluster-name: ${{ env.CLUSTER_NAME }}
+      #     admin: 'false'
+      #     use-kubelogin: 'true'
 
       - name: envsubst-action
         uses: danielr1996/envsubst-action@1.1.0
